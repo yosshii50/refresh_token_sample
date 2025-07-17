@@ -1,16 +1,5 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-
-async function authenticateUser(email: string, password: string) {
-    const response = await fetch('http://127.0.0.1:8000/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'username=' + email + '&password=' + password
-    });
-    const data = await response.json();
-    return data.access_token;
-}
-
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
@@ -29,12 +18,17 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
             return null;
-        }
-        const token = await authenticateUser(credentials.email, credentials.password);
-        if (token) {
-            return { id: "userId", name: "User Name", email: credentials.email, token };
-        }
-        return null;
+          }
+          const users = [
+            { id: "1", name: "TestUser1", email: "testuser1@example.com", password: "strongpassword123" },
+            { id: "2", name: "TestUser2", email: "testuser2@example.com", password: "hogehoge" },
+          ];
+          console.log(credentials.password);
+          const user = users.find((user) => user.email === credentials.email) || null;
+          if (user && user.password === credentials.password) {
+            return user;
+          }
+          return null;
       },
     }),
   ],
