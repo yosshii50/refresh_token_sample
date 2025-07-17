@@ -9,27 +9,22 @@ from typing import Optional
 
 app = FastAPI()
 
-origins = [
-    "http://127.0.0.1",
-    "http://127.0.0.1:3000",
-    "http://localhost",
-    "http://localhost:3000",
-#    "http://localhost:3000",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # 許可するオリジンを指定
+    allow_origins=[
+        "http://127.0.0.1:3000",
+        "http://localhost:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],  # 許可するHTTPメソッド
     allow_headers=["*"],  # 許可するHTTPヘッダー
 )
 
-# シークレットキー（本番環境では安全に管理してください）
-SECRET_KEY = "your-secret-key"
+# シークレットキー
+SECRET_KEY = "hoge_fuga_secret_key"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 3
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+ACCESS_TOKEN_EXPIRE_MINUTES = 3 # 3分
+REFRESH_TOKEN_EXPIRE_DAYS = 7 # 7日
 
 class Token(BaseModel):
     access_token: str
@@ -42,9 +37,9 @@ class RefreshTokenRequest(BaseModel):
 
 # ダミーユーザーデータ
 fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "password": "secret"
+    "sample_user@example.com": {
+        "username": "Sample Name",
+        "password": "sample_password"
     }
 }
 
@@ -74,6 +69,7 @@ def create_refresh_token2(user_id:str):
 
 @app.post("/token", response_model=Token)
 async def create_token(username: str = Form(...), password: str = Form(...)):
+    print(f"/token")
     now = datetime.now()
     formatted_now = now.strftime("%Y-%m-%d_%H-%M-%S")
     print(f"Request create_token() at: {formatted_now}")
@@ -99,6 +95,7 @@ async def create_token(username: str = Form(...), password: str = Form(...)):
 
 @app.post("/refresh")
 async def refresh_token(refresh_token: str = Form(...)):
+    print(f"/refresh")
     now = datetime.now()
     formatted_now = now.strftime("%Y-%m-%d_%H-%M-%S")
     print(f"Request refresh_token() at: {formatted_now}")
@@ -120,18 +117,13 @@ async def refresh_token(refresh_token: str = Form(...)):
             "token_type": "bearer",
             "access_token_expires": access_token_expires
         }
-    except jwt.ExpiredSignatureError:
-        print("ERR:Refresh token has expired")
-        raise HTTPException(status_code=401, detail="Invalid refresh token")
-    except jwt.DecodeError as e:
-        print("ERR:Malformed refresh token")
-        raise HTTPException(status_code=401, detail="Malformed refresh token")
     except Exception as e:
-        print(f"ERR:An unexpected error occurred: {str(e)}")
+        print(f"ERR:{str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/userinfo")
 async def get_user_info(authorization: Optional[str] = Header(None)):
+    print(f"/userinfo")
     if authorization is None:
         raise HTTPException(status_code=401, detail="Authorization header missing")
     
@@ -142,8 +134,6 @@ async def get_user_info(authorization: Optional[str] = Header(None)):
         if username is None:
             raise HTTPException(status_code=401, detail="Invalid token")
         return {"username": username}
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Expired token")
-    except jwt.DecodeError:
-        raise HTTPException(status_code=401, detail="Decode error")
-
+    except Exception as e:
+        print(f"ERR:{str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
