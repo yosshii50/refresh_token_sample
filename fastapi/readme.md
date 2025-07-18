@@ -31,9 +31,8 @@ source venv/bin/activate
 uvicorn main:app --reload
 
 # 動作確認
-curl -X 'POST' 'http://localhost:8000/token' -H 'accept: application/json' -H 'Content-Type: application/x-www-form-urlencoded' -d 'username=sample_user@example.com&password=sample_password'
-curl -X POST http://localhost:8000/token -H "Content-Type: application/x-www-form-urlencoded" -d "username=sample_user@example.com" -d "password=sample_password"
-curl -X POST http://localhost:8000/token -H "Content-Type: application/x-www-form-urlencoded" -d "username=sample_user@example.com&password=sample_password"
-
+curl --ipv4 -X 'POST' 'http://localhost:8000/token' -H 'accept: application/json' -H 'Content-Type: application/x-www-form-urlencoded' -d 'username=sample_user@example.com&password=sample_password'
+curl --ipv4 -X POST http://localhost:8000/token -H "Content-Type: application/x-www-form-urlencoded" -d "username=sample_user@example.com" -d "password=sample_password"
+curl --ipv4 -X POST http://localhost:8000/token -H "Content-Type: application/x-www-form-urlencoded" -d "username=sample_user@example.com&password=sample_password"
 
 

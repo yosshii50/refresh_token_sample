@@ -7,6 +7,7 @@ cd /next.js/app
 npm install js-cookie
 npm install --save-dev @types/js-cookie
 npm install next-auth
+npm install axios
 
 # Next.js起動
 cd /next.js/app

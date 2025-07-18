@@ -11,15 +11,18 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { LoginButton, LogoutButton } from "@/components/buttons.component";
 import { SessionInfoWrap } from "@/components/session.component";
+import { login_test00 } from "@/lib/login_test";
 
 export default async function Home() {
 
   const nextVersion = version();
   const session = await getServerSession(authOptions);
+  const ltestret = login_test00();
 
   return (
     <div>
 
+      {ltestret}
       <div>
         <LoginButton /><br />
         <LogoutButton /><br />
